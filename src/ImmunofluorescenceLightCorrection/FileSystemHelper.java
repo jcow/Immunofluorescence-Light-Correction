@@ -5,6 +5,12 @@ import java.io.File;
 
 public class FileSystemHelper {
 	
+	/**
+	 * Gets the directory, filename, and file extension of a file path
+	 * @param path 
+	 *		The path to the file
+	 * @return 
+	 */
 	public static String[] getFileCharacteristics(String path){
 		
 		String[] parts;
@@ -35,6 +41,12 @@ public class FileSystemHelper {
 		return ret;
 	}
 	
+	/**
+	 * Gets a listing of all the files within a directory
+	 * @param directory
+	 *		The files in the directory
+	 * @return 
+	 */
 	public static String[] getFilesWithinDirectory(String directory){
 		if(directory.compareTo("") == 0){
 			return null;
