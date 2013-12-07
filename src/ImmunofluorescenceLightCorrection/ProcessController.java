@@ -1,17 +1,12 @@
 
 package ImmunofluorescenceLightCorrection;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.LinkedList;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -19,7 +14,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 
 
@@ -51,29 +45,28 @@ public class ProcessController extends JFrame implements ActionListener{
 	}
 	
 	private void makeDisplay(){
-		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("Immunofluorescence Correction");   
 		setSize(windowWidth, windowHeight);
-		setLocationRelativeTo(null); // sets the project to the center of the screen
-		
+		setLocationRelativeTo(null); // center of screen
 		
 		this.setPreferredSize(new Dimension(windowWidth, windowHeight));
 		this.setLayout(new GridLayout(2,1, 20, 20));
 		
-		
-		bottomPanel = new JPanel();
-		bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.PAGE_AXIS));
-		
+		makeTopPanel();
+		makeBottomPanel();
+	}
+	
+	private void makeTopPanel(){
 		topPanel = new JPanel();
 		topPanel.setLayout(new GridLayout(1,2));
 		
-		JPanel topLeftPanel = new JPanel();
-		GUIHelper.setBorder(topLeftPanel, "Run Options");
-		
-		JPanel topRightPanel = new JPanel();
-		GUIHelper.setBorder(topRightPanel, "Selected Directory");
-		
+		this.add(topPanel);
+		makeTopLeftPanel();
+		makeTopRightPanel();
+	}
+	
+	private void makeTopLeftPanel(){
 		fChooserOpen = new JButton();
 		fChooserOpen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
@@ -90,6 +83,10 @@ public class ProcessController extends JFrame implements ActionListener{
 				}
 			}
 		});
+		
+		JPanel topLeftPanel = new JPanel();
+		GUIHelper.setBorder(topLeftPanel, "Run Options");
+		
 		fChooserOpen.setText("Choose Directory");
 		
 		process = new JButton("Process Directory");
@@ -98,25 +95,29 @@ public class ProcessController extends JFrame implements ActionListener{
 		topLeftPanel.add(fChooserOpen);
 		topLeftPanel.add(process);
 		
-		selectedDirectory = new JLabel("No Directory Selected");
-		
-		topRightPanel.add(selectedDirectory);
-		
 		topPanel.add(topLeftPanel);
-		topPanel.add(topRightPanel);
+	}
+	
+	private void makeTopRightPanel(){
+		JPanel topRightPanel = new JPanel();
+		GUIHelper.setBorder(topRightPanel, "Selected Directory");
 		
+		selectedDirectory = new JLabel("No Directory Selected");
+		topRightPanel.add(selectedDirectory);
+		topPanel.add(topRightPanel);
+	}
+	
+	private void makeBottomPanel(){
+		bottomPanel = new JPanel();
+		bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.PAGE_AXIS));
 		
 		JScrollPane panelScroller = new JScrollPane(bottomPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		GUIHelper.setBorder(panelScroller, "Results");
-		
-		
-		this.add(topPanel);
 		this.add(panelScroller);
 		
 		JLabel nothing = new JLabel("No process has been run");
 		bottomPanel.add(nothing);
 		output.add(nothing);
-		
 	}
 	
 	private void addToBottomPanel(String text){
