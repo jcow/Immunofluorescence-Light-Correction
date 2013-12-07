@@ -17,8 +17,6 @@ public class ImageAdjuster {
 	public boolean adjustImage(String filepath, String writeTo){
 		
 		String[] fileChar = FileSystemHelper.getFileCharacteristics(filepath);
-		String path = fileChar[0];
-		String filename = fileChar[1];
 		String fileExtension = fileChar[2];
 		
 		int[] bins = new int[binCount];
@@ -50,58 +48,13 @@ public class ImageAdjuster {
 		
 		double contributionBins = getTotalContributingPercentage(bins, currentImage.getWidth(), currentImage.getHeight());
 		
-		// small amount of bins, do the secondary parsing
+		// small amount of bins i.e. contrast, do the secondary parsing
 		if(contributionBins < binPercentage){
-			
-			int lowestFilledIndex = getLowestContributingIndex(bins);
-			float brightnessIterateBy = 0.01f * ((float)(bins.length-lowestFilledIndex))/bins.length;
-
-			for (int y = 0; y < newImage.getHeight(); y++) {
-					for (int x = 0; x < newImage.getWidth(); x++) {
-						int[] rgb = getRGB(currentImage, x, y);
-						int red = rgb[0];
-						int green = rgb[1];
-						int blue = rgb[2];
-
-						float[] hsb = Color.RGBtoHSB(red, green, blue, null);
-
-						int bin = (int)(100*hsb[2]);
-						float new_val = 0;
-						if(bin > lowestFilledIndex){
-							int multiplier = bin-lowestFilledIndex;
-							new_val = (multiplier * brightnessIterateBy);
-						}
-
-						hsb[2] = new_val;
-
-						int clr = Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]);
-						newImage.setRGB(x, y, clr);
-					}
-			}
+			correctWithLowContrast(currentImage, newImage, bins);
 		}
 		// normal spread
 		else{
-			int maxIndex = getMaxIndex(bins);
-			for (int y = 0; y < newImage.getHeight(); y++) {
-					for (int x = 0; x < newImage.getWidth(); x++) {
-						int[] rgb = getRGB(currentImage, x, y);
-						int red = rgb[0];
-						int green = rgb[1];
-						int blue = rgb[2];
-						
-						float[] hsb = Color.RGBtoHSB(red, green, blue, null);
-						float new_val = (float)(hsb[2] - maxIndex*0.01);
-						if(new_val < 0){
-							hsb[2] = 0f;
-						}
-						else{
-							hsb[2] = new_val;
-						}
-						
-						int clr = Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]);
-						newImage.setRGB(x, y, clr);
-					}
-			}
+			correctNormally(currentImage, newImage, bins);
 		}
 		
 		try {
@@ -114,6 +67,59 @@ public class ImageAdjuster {
 		}
 		
 		return true;
+	}
+	
+	
+	private void correctNormally(BufferedImage currentImage, BufferedImage newImage, int[] bins){
+		int maxIndex = getMaxIndex(bins);
+		for (int y = 0; y < newImage.getHeight(); y++) {
+				for (int x = 0; x < newImage.getWidth(); x++) {
+					int[] rgb = getRGB(currentImage, x, y);
+					int red = rgb[0];
+					int green = rgb[1];
+					int blue = rgb[2];
+
+					float[] hsb = Color.RGBtoHSB(red, green, blue, null);
+					float new_val = (float)(hsb[2] - maxIndex*0.01);
+					if(new_val < 0){
+						hsb[2] = 0f;
+					}
+					else{
+						hsb[2] = new_val;
+					}
+
+					int clr = Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]);
+					newImage.setRGB(x, y, clr);
+				}
+		}
+	}
+	
+	private void correctWithLowContrast(BufferedImage currentImage, BufferedImage newImage, int[] bins){
+		int lowestFilledIndex = getLowestContributingIndex(bins);
+		float brightnessIterateBy = 0.01f * ((float)(bins.length-lowestFilledIndex))/bins.length;
+
+		for (int y = 0; y < newImage.getHeight(); y++) {
+				for (int x = 0; x < newImage.getWidth(); x++) {
+					int[] rgb = getRGB(currentImage, x, y);
+					int red = rgb[0];
+					int green = rgb[1];
+					int blue = rgb[2];
+
+					float[] hsb = Color.RGBtoHSB(red, green, blue, null);
+
+					int bin = (int)(100*hsb[2]);
+					float new_val = 0;
+					if(bin > lowestFilledIndex){
+						int multiplier = bin-lowestFilledIndex;
+						new_val = (multiplier * brightnessIterateBy);
+					}
+
+					hsb[2] = new_val;
+
+					int clr = Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]);
+					newImage.setRGB(x, y, clr);
+				}
+		}
 	}
 	
 	public String getError(){
