@@ -4,6 +4,8 @@
 ##What it does
 In microbiology, biologists sometimes use light microscopy to take images of cells that have been fluoresced using specific dyes and antibodies.  Photobleaching/overexsposure is a common occurrence with these images.  This system was created to take in a directory of these images and render out new images where the light has been corrected.
 
+To see some examples look in the screenshots folder.
+
 
 ## Created for
 This project was done for my bioinformatics class.  There is a biology lab that takes quite a large of amount of photos and their manual process was taking up too much time.
